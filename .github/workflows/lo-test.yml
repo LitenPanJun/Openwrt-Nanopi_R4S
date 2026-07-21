@@ -16,7 +16,7 @@ jobs:
       BRANCH: ${{ github.event.inputs.version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
@@ -79,7 +79,7 @@ jobs:
             -exec cp {} $GITHUB_WORKSPACE/artifact/ \;
 
       - name: Upload firmware
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: nanopi-r4s-firmware
           path: artifact/
