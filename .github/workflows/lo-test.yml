@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'OpenWrt version'
-        default: 'openwrt-25.12'
+        description: 'OpenWrt version (tag or branch)'
+        default: 'v25.12.5'
         required: false
 
 jobs:
