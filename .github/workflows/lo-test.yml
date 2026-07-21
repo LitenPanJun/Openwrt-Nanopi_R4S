@@ -41,9 +41,6 @@ jobs:
       - name: Merge custom packages
         run: |
           cd openwrt
-          # 手动拷贝 openclash/easytier 到 package/ 目录后它们会被自动编译
-          # 也可将包文件夹放入本仓库根目录下的 custom_packages/
-          [ -d $GITHUB_WORKSPACE/custom_packages ] && cp -r $GITHUB_WORKSPACE/custom_packages/* package/
           . $GITHUB_WORKSPACE/scripts/merge_packages.sh
           . $GITHUB_WORKSPACE/scripts/patches.sh
 

@@ -16,7 +16,7 @@ CONFIG_PACKAGE_docker=y
 CONFIG_PACKAGE_dockerd=y
 CONFIG_PACKAGE_docker-compose=y
 
-# Applications (需手动拷贝到 package/ 目录: openclash, easytier, luci-app-easytier)
+# Applications
 CONFIG_PACKAGE_easytier=y
 CONFIG_PACKAGE_git=y
 CONFIG_PACKAGE_git-http=y
