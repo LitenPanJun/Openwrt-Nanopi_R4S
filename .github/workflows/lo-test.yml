@@ -4,16 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'OpenWrt version (tag or branch)'
-        default: 'v25.12.5'
+        description: 'OpenWrt version (tag, branch, or "auto")'
+        default: 'auto'
         required: false
 
 jobs:
   build:
     name: Build NanoPi R4S firmware
     runs-on: ubuntu-latest
-    env:
-      BRANCH: ${{ github.event.inputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,9 +26,22 @@ jobs:
             zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 \
             python3-pip python3-pyelftools python3-docutils rsync curl file
 
+      - name: Resolve OpenWrt version
+        id: resolve-version
+        run: |
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          if [ "$INPUT_VERSION" = "auto" ]; then
+            LATEST=$(git ls-remote --tags https://git.openwrt.org/openwrt/openwrt.git | \
+              grep -o 'refs/tags/v25\.12\.[0-9]*' | sort -t. -k3 -n | tail -1 | sed 's|refs/tags/||')
+            echo "Auto-detected latest: $LATEST"
+            echo "version=$LATEST" >> $GITHUB_OUTPUT
+          else
+            echo "version=$INPUT_VERSION" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout OpenWrt
         run: |
-          git clone -b $BRANCH --single-branch https://git.openwrt.org/openwrt/openwrt.git openwrt
+          git clone -b ${{ steps.resolve-version.outputs.version }} --single-branch https://git.openwrt.org/openwrt/openwrt.git openwrt
 
       - name: Update feeds
         run: |
