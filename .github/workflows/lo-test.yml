@@ -51,9 +51,10 @@ jobs:
         run: |
           cd openwrt
           rm -rf tmp
-          cat $GITHUB_WORKSPACE/r4s.config.seed $GITHUB_WORKSPACE/common.seed > .config
+          # 先添加所有 luci-app 模块 (=m)，再用种子文件覆盖为内置 (=y)
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | \
-            xargs -ri echo CONFIG_PACKAGE_{}=m >> .config
+            xargs -ri echo CONFIG_PACKAGE_{}=m > .config
+          cat $GITHUB_WORKSPACE/r4s.config.seed $GITHUB_WORKSPACE/common.seed >> .config
           cat $GITHUB_WORKSPACE/extra_packages.seed >> .config
           make defconfig
 
