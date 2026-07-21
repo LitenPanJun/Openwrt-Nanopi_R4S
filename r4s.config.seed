@@ -1,0 +1,39 @@
+CONFIG_TARGET_rockchip=y
+CONFIG_TARGET_rockchip_armv8=y
+CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r4s=y
+
+CONFIG_TARGET_OPTIMIZATION="-O3 -pipe -march=armv8-a+crypto+crc -mcpu=cortex-a72.cortex-a53+crypto+crc -mtune=cortex-a72.cortex-a53"
+CONFIG_TARGET_ROOTFS_PARTSIZE=640
+
+# Network drivers
+CONFIG_PACKAGE_kmod-r8169=y
+CONFIG_PACKAGE_r8169-firmware=y
+CONFIG_PACKAGE_kmod-tcp-bbr=y
+CONFIG_PACKAGE_iptables-mod-tproxy=y
+
+# Docker
+CONFIG_PACKAGE_docker=y
+CONFIG_PACKAGE_dockerd=y
+CONFIG_PACKAGE_docker-compose=y
+
+# Applications (需手动拷贝到 package/ 目录: openclash, easytier, luci-app-easytier)
+CONFIG_PACKAGE_easytier=y
+CONFIG_PACKAGE_git=y
+CONFIG_PACKAGE_git-http=y
+CONFIG_PACKAGE_luci-app-dockerman=y
+CONFIG_PACKAGE_luci-app-easytier=y
+CONFIG_PACKAGE_luci-app-firewall=y
+CONFIG_PACKAGE_luci-app-openclash=y
+CONFIG_PACKAGE_luci-app-package-manager=y
+CONFIG_PACKAGE_luci-app-upnp=y
+CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-dockerman-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-firewall-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-package-manager-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-upnp-zh-cn=y
+CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_luci-theme-glass=y
+CONFIG_PACKAGE_owut=y
+CONFIG_PACKAGE_ttyd=y
+CONFIG_PACKAGE_unzip=y
+CONFIG_PACKAGE_attendedsysupgrade-common=y

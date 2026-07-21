@@ -1,0 +1,2 @@
+# Extra packages for slim software center
+CONFIG_PACKAGE_zram-swap=m

@@ -1,0 +1,85 @@
+name: Build R4S Firmware
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'OpenWrt version'
+        default: 'openwrt-25.12'
+        required: false
+
+jobs:
+  build:
+    name: Build NanoPi R4S firmware
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{ github.event.inputs.version }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt -qq -y --no-install-recommends install build-essential ccache clang \
+            gcc-multilib g++-multilib flex bison libncurses5-dev libncursesw5-dev \
+            zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 \
+            python3-pip python3-pyelftools python3-docutils rsync curl file
+
+      - name: Checkout OpenWrt
+        run: |
+          git clone -b $BRANCH --single-branch https://git.openwrt.org/openwrt/openwrt.git openwrt
+
+      - name: Update feeds
+        run: |
+          cd openwrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Merge custom packages
+        run: |
+          cd openwrt
+          # 手动拷贝 openclash/easytier 到 package/ 目录后它们会被自动编译
+          # 也可将包文件夹放入本仓库根目录下的 custom_packages/
+          [ -d $GITHUB_WORKSPACE/custom_packages ] && cp -r $GITHUB_WORKSPACE/custom_packages/* package/
+          . $GITHUB_WORKSPACE/scripts/merge_packages.sh
+          . $GITHUB_WORKSPACE/scripts/patches.sh
+
+      - name: Configure firmware
+        run: |
+          cd openwrt
+          rm -rf tmp
+          cat $GITHUB_WORKSPACE/r4s.config.seed $GITHUB_WORKSPACE/common.seed > .config
+          find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | \
+            xargs -ri echo CONFIG_PACKAGE_{}=m >> .config
+          cat $GITHUB_WORKSPACE/extra_packages.seed >> .config
+          make defconfig
+
+      - name: Download sources
+        run: |
+          cd openwrt
+          rm -rf dl
+          while true; do make download -j8 && break || true; done
+
+      - name: Build firmware
+        run: |
+          cd openwrt
+          nproc_count=$(nproc)
+          [ $nproc_count -gt 8 ] && con=$((nproc_count/2+3)) || con=$nproc_count
+          make -j$con IGNORE_ERRORS=1
+
+      - name: Prepare artifact
+        run: |
+          cd openwrt
+          mkdir -p $GITHUB_WORKSPACE/artifact
+          cp -rf .config $GITHUB_WORKSPACE/artifact/
+          find bin/targets/ -type f \( -name "*.img.gz" -o -name "*.manifest" -o -name "*.buildinfo" \) \
+            -exec cp {} $GITHUB_WORKSPACE/artifact/ \;
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: nanopi-r4s-firmware
+          path: artifact/
