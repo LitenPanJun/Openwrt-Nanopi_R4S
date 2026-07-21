@@ -1,8 +1,0 @@
-#!/bin/sh
-
-uci set network.wan.proto='pppoe'
-uci set network.wan.username='18369386366'
-uci set network.wan.password='123456'
-uci commit network
-
-exit 0
